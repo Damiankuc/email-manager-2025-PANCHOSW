@@ -1,18 +1,25 @@
-package com.ucp.gestor;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+package com.gestor;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.ucp.gestor.BandejaType;
+import com.ucp.gestor.Contacto;
+import com.ucp.gestor.Email;
+import com.ucp.gestor.Filtro;
+import com.ucp.gestor.GestorEmails;
 
 public class GestorEmailsTest {
     private GestorEmails gestor;
     private Contacto c1, c2;
 
-    @BeforeEach
+    @Before
     public void setup() {
         gestor = new GestorEmails();
         c1 = gestor.crearContacto("A", "a@demo.com");

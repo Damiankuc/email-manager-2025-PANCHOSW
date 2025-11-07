@@ -1,4 +1,4 @@
-package com.ucp.gestor;
+package com.gestor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,11 @@ public class Bandeja {
     public Bandeja(BandejaType tipo) {
         this.tipo = tipo;
         this.correos = new ArrayList<>();
+    }
+
+    public Bandeja(List<Email> correos, BandejaType tipo) {
+        this.correos = correos;
+        this.tipo = tipo;
     }
 
     public BandejaType getTipo() { return tipo; }

@@ -1,4 +1,4 @@
-package com.ucp.gestor;
+package com.gestor;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,6 +21,11 @@ public class Email {
         this.para = new ArrayList<>();
         this.fecha = Instant.now();
         this.borrador = true;
+    }
+
+    public Email(String id, List<Contacto> para) {
+        this.id = id;
+        this.para = para;
     }
 
     public String getId() { return id; }

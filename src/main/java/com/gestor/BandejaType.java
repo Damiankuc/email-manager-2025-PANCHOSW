@@ -1,4 +1,4 @@
-package com.ucp.gestor;
+package com.gestor;
 
 public enum BandejaType {
     ENTRADA,

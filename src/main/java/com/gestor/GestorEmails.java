@@ -1,9 +1,14 @@
-package com.ucp.gestor;
+package com.gestor;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 /**
  * Gestor principal: maneja contactos, bandejas, envíos, borradores y filtros.
  * No implementa transporte real de correo — es un simulador para el TP.
@@ -20,6 +25,12 @@ public class GestorEmails {
         }
         contactos = new HashSet<>();
         emailIndex = new HashMap<>();
+    }
+
+    public GestorEmails(Map<BandejaType, Bandeja> bandejas, Set<Contacto> contactos, Map<String, Email> emailIndex) {
+        this.bandejas = bandejas;
+        this.contactos = contactos;
+        this.emailIndex = emailIndex;
     }
 
     // ----------------- Contactos -----------------
