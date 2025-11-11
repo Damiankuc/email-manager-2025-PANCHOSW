@@ -9,11 +9,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ucp.gestor.BandejaType;
-import com.ucp.gestor.Contacto;
-import com.ucp.gestor.Email;
-import com.ucp.gestor.Filtro;
-import com.ucp.gestor.GestorEmails;
 
 public class GestorEmailsTest {
     private GestorEmails gestor;

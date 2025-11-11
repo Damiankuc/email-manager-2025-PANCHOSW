@@ -1,6 +1,6 @@
-com\ucp\gestor\GestorEmails.class
-com\ucp\gestor\Bandeja.class
-com\ucp\gestor\BandejaType.class
-com\ucp\gestor\Email.class
-com\ucp\gestor\Contacto.class
-com\ucp\gestor\Filtro.class
+com\gestor\Filtro.class
+com\gestor\BandejaType.class
+com\gestor\GestorEmails.class
+com\gestor\Bandeja.class
+com\gestor\Contacto.class
+com\gestor\Email.class
