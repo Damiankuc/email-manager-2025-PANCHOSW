@@ -1,9 +1,11 @@
 package com.gestor;
 
 public enum BandejaType {
-    ENTRADA,
     ENVIADOS,
+    ENTRADA,
     BORRADORES,
-    ELIMINADOS,
-    FAVORITOS
+    FAVORITOS,
+    LEIDO,
+    NONLEIDO,
+    ELIMINADOS
 }

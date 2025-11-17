@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestorEmails.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gestor de Emails con Filtros - UCP</a> &gt; <a href="index.source.html" class="el_package">com.gestor</a> &gt; <span class="el_source">GestorEmails.java</span></div><h1>GestorEmails.java</h1><pre class="source lang-java linenums">package com.gestor;
+
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+/**
+ * Gestor principal: maneja contactos, bandejas, envíos, borradores y filtros.
+ * No implementa transporte real de correo — es un simulador para el TP.
+ */
+public class GestorEmails {
+    private final Map&lt;BandejaType, Bandeja&gt; bandejas;
+    private final Set&lt;Contacto&gt; contactos;
+    private final Map&lt;String, Email&gt; emailIndex; // por id, para operaciones rápidas
+
+<span class="fc" id="L21">    public GestorEmails() {</span>
+<span class="fc" id="L22">        bandejas = new EnumMap&lt;&gt;(BandejaType.class);</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        for (BandejaType t : BandejaType.values()) {</span>
+<span class="fc" id="L24">            bandejas.put(t, new Bandeja(t));</span>
+        }
+<span class="fc" id="L26">        contactos = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L27">        emailIndex = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L28">    }</span>
+
+<span class="nc" id="L30">    public GestorEmails(Map&lt;BandejaType, Bandeja&gt; bandejas, Set&lt;Contacto&gt; contactos, Map&lt;String, Email&gt; emailIndex) {</span>
+<span class="nc" id="L31">        this.bandejas = bandejas;</span>
+<span class="nc" id="L32">        this.contactos = contactos;</span>
+<span class="nc" id="L33">        this.emailIndex = emailIndex;</span>
+<span class="nc" id="L34">    }</span>
+
+    // ----------------- Contactos -----------------
+    public Contacto crearContacto(String nombre, String email) {
+<span class="fc" id="L38">        Contacto c = new Contacto(nombre, email);</span>
+<span class="fc" id="L39">        contactos.remove(c); // evitar duplicados por email</span>
+<span class="fc" id="L40">        contactos.add(c);</span>
+<span class="fc" id="L41">        return c;</span>
+    }
+
+    public boolean eliminarContacto(String email) {
+<span class="nc" id="L45">        return contactos.removeIf(c -&gt; c.getEmail().equalsIgnoreCase(email));</span>
+    }
+
+    public Optional&lt;Contacto&gt; buscarContactoPorEmail(String email) {
+<span class="nc" id="L49">        return contactos.stream().filter(c -&gt; c.getEmail().equalsIgnoreCase(email)).findFirst();</span>
+    }
+
+    public Set&lt;Contacto&gt; listarContactos() {
+<span class="nc" id="L53">        return Collections.unmodifiableSet(contactos);</span>
+    }
+
+    // ----------------- Email lifecycle -----------------
+    public Email crearEmail(Contacto remitente, String asunto, String contenido, List&lt;Contacto&gt; para) {
+<span class="fc" id="L58">        Email e = new Email();</span>
+<span class="fc" id="L59">        e.setRemitente(remitente);</span>
+<span class="fc" id="L60">        e.setAsunto(asunto);</span>
+<span class="fc" id="L61">        e.setContenido(contenido);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        for (Contacto c : para) e.addPara(c);</span>
+<span class="fc" id="L63">        e.setBorrador(true);</span>
+<span class="fc" id="L64">        indexEmail(e);</span>
+<span class="fc" id="L65">        bandejas.get(BandejaType.BORRADORES).agregar(e);</span>
+<span class="fc" id="L66">        return e;</span>
+    }
+
+    public void guardarBorrador(Email e) {
+<span class="nc" id="L70">        e.setBorrador(true);</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (!bandejas.get(BandejaType.BORRADORES).todos().contains(e)) {</span>
+<span class="nc" id="L72">            bandejas.get(BandejaType.BORRADORES).agregar(e);</span>
+        }
+<span class="nc" id="L74">        indexEmail(e);</span>
+<span class="nc" id="L75">    }</span>
+
+    public void editarEmail(Email e, String asunto, String contenido, List&lt;Contacto&gt; para) {
+<span class="nc" id="L78">        e.setAsunto(asunto);</span>
+<span class="nc" id="L79">        e.setContenido(contenido);</span>
+<span class="nc" id="L80">        e.getPara().clear();</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (para != null) para.forEach(e::addPara);</span>
+<span class="nc" id="L82">        indexEmail(e);</span>
+<span class="nc" id="L83">    }</span>
+
+    /**
+     * Enviar email: marca como no borrador, lo mueve a Enviados, y simula entrega agregándolo a la Bandeja ENTRADA
+     * de cada destinatario (en este modelo simple; no gestionamos cuentas separadas).
+     */
+    public void enviar(Email e) {
+        // quitar de borradores si estaba ahi
+<span class="fc" id="L91">        bandejas.get(BandejaType.BORRADORES).eliminar(e);</span>
+
+<span class="fc" id="L93">        e.setBorrador(false);</span>
+<span class="fc" id="L94">        e.setFecha(java.time.Instant.now());</span>
+<span class="fc" id="L95">        e.setLeido(false);</span>
+
+<span class="fc" id="L97">        bandejas.get(BandejaType.ENVIADOS).agregar(e);</span>
+<span class="fc" id="L98">        indexEmail(e);</span>
+
+        // simulamos entrega: agregamos copia en la bandeja ENTRADA (mismo objeto en este modelo simple)
+<span class="fc" id="L101">        bandejas.get(BandejaType.ENTRADA).agregar(e);</span>
+
+        // Agregar a NONLEIDO por defecto al enviar
+<span class="fc" id="L104">        bandejas.get(BandejaType.NONLEIDO).agregar(e);</span>
+<span class="fc" id="L105">    }</span>
+
+    public boolean moverEmail(Email e, BandejaType origen, BandejaType destino) {
+<span class="nc" id="L108">        Bandeja bOrigen = bandejas.get(origen);</span>
+<span class="nc" id="L109">        Bandeja bDestino = bandejas.get(destino);</span>
+<span class="nc bnc" id="L110" title="All 4 branches missed.">        if (bOrigen == null || bDestino == null) return false;</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (!bOrigen.todos().contains(e)) return false;</span>
+<span class="nc" id="L112">        bOrigen.eliminar(e);</span>
+<span class="nc" id="L113">        bDestino.agregar(e);</span>
+<span class="nc" id="L114">        return true;</span>
+    }
+
+    public void marcarLeido(String emailId, boolean leido) {
+<span class="fc" id="L118">        Email e = emailIndex.get(emailId);</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        if (e != null) {</span>
+<span class="fc" id="L120">            e.setLeido(leido);</span>
+            // Mover a la bandeja correspondiente según el estado de leído
+<span class="fc bfc" id="L122" title="All 2 branches covered.">            if (leido) {</span>
+                // Si se marca como leído, quitar de NOLEIDO y agregar a LEIDO si no está ya
+<span class="fc" id="L124">                bandejas.get(BandejaType.NONLEIDO).eliminar(e);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">                if (!bandejas.get(BandejaType.LEIDO).todos().contains(e)) {</span>
+<span class="fc" id="L126">                    bandejas.get(BandejaType.LEIDO).agregar(e);</span>
+                }
+            } else {
+                // Si se marca como no leído, quitar de LEIDO y agregar a NONLEIDO si no está ya
+<span class="fc" id="L130">                bandejas.get(BandejaType.LEIDO).eliminar(e);</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">                if (!bandejas.get(BandejaType.NONLEIDO).todos().contains(e)) {</span>
+<span class="nc" id="L132">                    bandejas.get(BandejaType.NONLEIDO).agregar(e);</span>
+                }
+            }
+        }
+<span class="fc" id="L136">    }</span>
+
+    public void marcarFavorito(String emailId, boolean fav) {
+<span class="fc" id="L139">        Email e = emailIndex.get(emailId);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (e != null) {</span>
+<span class="fc" id="L141">            e.setFavorito(fav);</span>
+            // si es favorito, asegurar en bandeja FAVORITOS (evitar duplicados)
+<span class="fc" id="L143">            List&lt;Email&gt; favs = bandejas.get(BandejaType.FAVORITOS).todos();</span>
+<span class="pc bpc" id="L144" title="2 of 4 branches missed.">            if (fav &amp;&amp; !favs.contains(e)) bandejas.get(BandejaType.FAVORITOS).agregar(e);</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">            if (!fav) bandejas.get(BandejaType.FAVORITOS).eliminar(e);</span>
+        }
+<span class="fc" id="L147">    }</span>
+
+    public void eliminarDefinitivo(Email e) {
+        // quitar de todas las bandejas y ubicar en ELIMINADOS
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        for (Bandeja b : bandejas.values()) {</span>
+<span class="nc" id="L152">            b.eliminar(e);</span>
+<span class="nc" id="L153">        }</span>
+<span class="nc" id="L154">        bandejas.get(BandejaType.ELIMINADOS).agregar(e);</span>
+<span class="nc" id="L155">    }</span>
+
+    public List&lt;Email&gt; buscarEnBandeja(BandejaType tipo, Predicate&lt;Email&gt; pred) {
+<span class="fc" id="L158">        return bandejas.get(tipo).buscar(pred);</span>
+    }
+
+    public List&lt;Email&gt; buscarTextoEnBandeja(BandejaType tipo, String textoLibre) {
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        String q = textoLibre == null ? &quot;&quot; : textoLibre.toLowerCase();</span>
+<span class="nc" id="L163">        return buscarEnBandeja(tipo, e -&gt;</span>
+<span class="nc bnc" id="L164" title="All 4 branches missed.">                (e.getAsunto() != null &amp;&amp; e.getAsunto().toLowerCase().contains(q)) ||</span>
+<span class="nc bnc" id="L165" title="All 4 branches missed.">                (e.getContenido() != null &amp;&amp; e.getContenido().toLowerCase().contains(q)) ||</span>
+<span class="nc bnc" id="L166" title="All 4 branches missed.">                (e.getRemitente() != null &amp;&amp; e.getRemitente().getEmail().toLowerCase().contains(q)) ||</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                (e.getPara().stream().anyMatch(c -&gt; c.getEmail().toLowerCase().contains(q)))</span>
+        );
+    }
+
+    public List&lt;Email&gt; aplicarFiltroSobreBandeja(Filtro filtro, BandejaType tipo) {
+<span class="fc" id="L172">        return buscarEnBandeja(tipo, filtro.getPredicado());</span>
+    }
+
+    public List&lt;Email&gt; getTodosEnBandeja(BandejaType tipo) {
+<span class="fc" id="L176">        return bandejas.get(tipo).todos();</span>
+    }
+
+    // ----------------- Indexing -----------------
+    private void indexEmail(Email e) {
+<span class="fc" id="L181">        emailIndex.put(e.getId(), e);</span>
+<span class="fc" id="L182">    }</span>
+
+    public Optional&lt;Email&gt; buscarPorId(String id) {
+<span class="nc" id="L185">        return Optional.ofNullable(emailIndex.get(id));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

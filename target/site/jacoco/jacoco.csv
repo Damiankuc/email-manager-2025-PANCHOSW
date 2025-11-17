@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Gestor de Emails con Filtros - UCP,com.gestor,Bandeja,16,37,0,0,7,9,3,5,3,5
+Gestor de Emails con Filtros - UCP,com.gestor,BandejaType,0,45,0,0,0,8,0,1,0,1
+Gestor de Emails con Filtros - UCP,com.gestor,Email,48,61,0,0,11,17,8,12,8,12
+Gestor de Emails con Filtros - UCP,com.gestor,GestorEmails,224,265,35,13,39,51,35,13,14,10
+Gestor de Emails con Filtros - UCP,com.gestor,Contacto,45,19,6,0,11,5,9,2,6,2
+Gestor de Emails con Filtros - UCP,com.gestor,Filtro,45,16,0,0,5,5,5,2,5,2

@@ -99,6 +99,9 @@ public class GestorEmails {
 
         // simulamos entrega: agregamos copia en la bandeja ENTRADA (mismo objeto en este modelo simple)
         bandejas.get(BandejaType.ENTRADA).agregar(e);
+
+        // Agregar a NONLEIDO por defecto al enviar
+        bandejas.get(BandejaType.NONLEIDO).agregar(e);
     }
 
     public boolean moverEmail(Email e, BandejaType origen, BandejaType destino) {
@@ -113,7 +116,23 @@ public class GestorEmails {
 
     public void marcarLeido(String emailId, boolean leido) {
         Email e = emailIndex.get(emailId);
-        if (e != null) e.setLeido(leido);
+        if (e != null) {
+            e.setLeido(leido);
+            // Mover a la bandeja correspondiente según el estado de leído
+            if (leido) {
+                // Si se marca como leído, quitar de NOLEIDO y agregar a LEIDO si no está ya
+                bandejas.get(BandejaType.NONLEIDO).eliminar(e);
+                if (!bandejas.get(BandejaType.LEIDO).todos().contains(e)) {
+                    bandejas.get(BandejaType.LEIDO).agregar(e);
+                }
+            } else {
+                // Si se marca como no leído, quitar de LEIDO y agregar a NONLEIDO si no está ya
+                bandejas.get(BandejaType.LEIDO).eliminar(e);
+                if (!bandejas.get(BandejaType.NONLEIDO).todos().contains(e)) {
+                    bandejas.get(BandejaType.NONLEIDO).agregar(e);
+                }
+            }
+        }
     }
 
     public void marcarFavorito(String emailId, boolean fav) {
