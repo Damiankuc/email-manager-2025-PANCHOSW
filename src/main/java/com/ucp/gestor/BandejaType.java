@@ -1,4 +1,4 @@
-package com.gestor;
+package com.ucp.gestor;
 
 public enum BandejaType {
     ENVIADOS,

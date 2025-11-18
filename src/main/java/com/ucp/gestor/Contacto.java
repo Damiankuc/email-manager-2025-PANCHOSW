@@ -1,4 +1,4 @@
-package com.gestor;
+package com.ucp.gestor;
 
 import java.util.Objects;
 
@@ -28,19 +28,22 @@ public class Contacto {
     }
 
     @Override
-    public String toString() {
-        return nombre + " <" + email + ">";
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(email.toLowerCase());
+    public boolean equals(Object o) {
+        // Sin if: usamos instanceof + lógica booleana
+        return (o instanceof Contacto)
+                && email != null
+                && ((Contacto) o).email != null
+                && email.equalsIgnoreCase(((Contacto) o).email);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Contacto other = (Contacto) obj;
-        return email.toLowerCase().equals(other.email.toLowerCase());
+    public int hashCode() {
+        String correo = email == null ? "" : email.toLowerCase();
+        return Objects.hash(correo);
+    }
+
+    @Override
+    public String toString() {
+        return nombre + " <" + email + ">";
     }
 }
